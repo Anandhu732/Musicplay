@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Classy Music Player</title>
+
+<title>Dev Music Player</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1117">
 
 <style>
 
@@ -11,108 +15,117 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family: "Segoe UI", sans-serif;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial;
 }
 
 body{
 height:100vh;
 display:flex;
-justify-content:center;
+flex-direction:column;
+background:#0d1117;
+color:#c9d1d9;
+}
+
+/* TOP BAR */
+
+.topbar{
+height:50px;
+background:#161b22;
+border-bottom:1px solid #30363d;
+display:flex;
 align-items:center;
-
-/* Responsive background */
-background-image: url("https://unsplash.com/photos/pink-particle-flow-against-a-black-background-cuQ8pMEzumM");
-background-size: cover;
-background-position: center;
-background-repeat: no-repeat;
-background-attachment: fixed;
+padding:0 20px;
+font-weight:600;
 }
 
-/* dark overlay for readability */
-body::before{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.45);
-z-index:-1;
+/* CONTENT */
+
+.container{
+flex:1;
+display:flex;
 }
 
-.player{
-width:340px;
-padding:25px;
-border-radius:20px;
-background: rgba(255,255,255,0.08);
-backdrop-filter: blur(15px);
-box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-color:white;
-text-align:center;
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+background:#161b22;
+border-right:1px solid #30363d;
+padding:15px;
 }
 
-h2{
-margin-bottom:15px;
-font-weight:500;
+.sidebar h3{
+margin-bottom:10px;
+font-size:14px;
+color:#8b949e;
 }
 
-input[type=file]{
-margin-bottom:15px;
-color:white;
+.sidebar ul{
+list-style:none;
+}
+
+.sidebar li{
+padding:8px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.sidebar li:hover{
+background:#21262d;
+}
+
+/* MAIN AREA */
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
 }
 
 .song-name{
-font-size:14px;
 margin-top:10px;
-opacity:0.85;
+color:#8b949e;
 }
 
-.progress{
-width:100%;
-margin-top:20px;
-}
+/* PLAYER BAR */
 
-.controls{
-margin-top:20px;
+.player-bar{
+height:70px;
+background:#161b22;
+border-top:1px solid #30363d;
 display:flex;
+align-items:center;
 justify-content:center;
 gap:15px;
 }
 
+/* BUTTONS */
+
 button{
-width:50px;
-height:50px;
-border:none;
-border-radius:50%;
-font-size:18px;
-cursor:pointer;
-background:rgba(255,255,255,0.15);
+width:40px;
+height:40px;
+background:#21262d;
+border:1px solid #30363d;
+border-radius:6px;
 color:white;
-transition:0.3s;
+font-size:16px;
+cursor:pointer;
 }
 
 button:hover{
-background:rgba(255,255,255,0.35);
+background:#30363d;
+}
+
+/* SLIDERS */
+
+.progress{
+width:40%;
 }
 
 .volume{
-margin-top:15px;
-}
-
-/* mobile responsiveness */
-
-@media(max-width:500px){
-
-.player{
-width:90%;
-padding:20px;
-}
-
-button{
-width:45px;
-height:45px;
-}
-
+width:120px;
 }
 
 </style>
@@ -120,76 +133,101 @@ height:45px;
 
 <body>
 
-<div class="player">
+<div class="topbar">
+🎵 Dev Music Player
+</div>
 
-<h2>🎵 Music Player</h2>
+<div class="container">
+
+<div class="sidebar">
+<h3>Library</h3>
+<ul>
+<li>🎧 My Music</li>
+<li>⭐ Favorites</li>
+<li>📁 Local Files</li>
+</ul>
+</div>
+
+<div class="main">
 
 <input type="file" id="fileInput" accept="audio/*">
 
-<div class="song-name" id="songName">No song selected</div>
+<div class="song-name" id="songName">
+No song selected
+</div>
 
 <audio id="audio"></audio>
 
-<input type="range" id="progress" class="progress" value="0">
+</div>
 
-<div class="controls">
+</div>
+
+<div class="player-bar">
+
 <button onclick="playMusic()">▶</button>
 <button onclick="pauseMusic()">⏸</button>
 <button onclick="stopMusic()">⏹</button>
-</div>
 
-<div class="volume">
-<input type="range" id="volume" min="0" max="1" step="0.01" value="1">
-</div>
+<input type="range" id="progress" class="progress" value="0">
+
+<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="1">
 
 </div>
 
 <script>
 
-const audio = document.getElementById("audio")
-const fileInput = document.getElementById("fileInput")
-const progress = document.getElementById("progress")
-const volume = document.getElementById("volume")
-const songName = document.getElementById("songName")
+const audio=document.getElementById("audio")
+const fileInput=document.getElementById("fileInput")
+const progress=document.getElementById("progress")
+const volume=document.getElementById("volume")
+const songName=document.getElementById("songName")
 
-fileInput.addEventListener("change", function(){
+fileInput.addEventListener("change",function(){
 
-let file = this.files[0]
+let file=this.files[0]
 
 if(file){
-audio.src = URL.createObjectURL(file)
-songName.textContent = file.name
+audio.src=URL.createObjectURL(file)
+songName.textContent=file.name
 }
 
 })
 
-function playMusic(){
-audio.play()
-}
-
-function pauseMusic(){
-audio.pause()
-}
+function playMusic(){ audio.play() }
+function pauseMusic(){ audio.pause() }
 
 function stopMusic(){
 audio.pause()
-audio.currentTime = 0
+audio.currentTime=0
 }
 
-audio.addEventListener("timeupdate", () => {
-progress.value = (audio.currentTime / audio.duration) * 100
+audio.addEventListener("timeupdate",()=>{
+
+progress.value=(audio.currentTime/audio.duration)*100
+
 })
 
-progress.addEventListener("input", () => {
-audio.currentTime = (progress.value / 100) * audio.duration
+progress.addEventListener("input",()=>{
+
+audio.currentTime=(progress.value/100)*audio.duration
+
 })
 
-volume.addEventListener("input", () => {
-audio.volume = volume.value
+volume.addEventListener("input",()=>{
+
+audio.volume=volume.value
+
 })
+
+/* REGISTER SERVICE WORKER */
+
+if("serviceWorker" in navigator){
+
+navigator.serviceWorker.register("service-worker.js")
+
+}
 
 </script>
 
 </body>
 </html>
-
